@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track It - Vehicle Entry</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <main class="container">
+        <h1>Track It</h1>
+        <p style="text-align:center;">Smart Parking Management System</p>
+
+        <section class="panel">
+            <h2>Register Vehicle Entry</h2>
+
+            <label for="video">Camera</label>
+            <video id="video" autoplay playsinline muted></video>
+            <canvas id="canvas" hidden></canvas>
+
+            <button type="button" id="captureButton" onclick="capturePhoto()">
+                Capture Number Plate
+            </button>
+
+            <p>
+                <strong>Detected number:</strong>
+                <span id="detectedNumber">Not captured yet</span>
+            </p>
+
+            <label for="numberPlate">Vehicle Number</label>
+            <input id="numberPlate" type="text" placeholder="Example: DL12AB1234" autocomplete="off" maxlength="15">
+
+            <label for="phone">Vehicle Owner's Mobile Number</label>
+            <input id="phone" type="tel" placeholder="Example: 9876543210" autocomplete="tel" maxlength="13">
+
+            <button type="button" onclick="verifyCar()">
+                Continue
+            </button>
+
+            <p id="entryMessage" class="message" role="status"></p>
+        </section>
+
+        <section class="panel">
+            <h2>Quick Links</h2>
+            <button type="button" onclick="location.href='parking.html'">
+                View Parking Slots
+            </button>
+            <button type="button" onclick="location.href='admin.html'">
+                Admin Dashboard
+            </button>
+        </section>
+    </main>
+
+    <div id="popupModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-content">
+            <h2 id="modalTitle">Confirm Vehicle Type</h2>
+            <p>Vehicle: <strong id="popupCarNumber"></strong></p>
+            <p>Choose the type of vehicle entry.</p>
+
+            <button type="button" onclick="grantAccess()">
+                Resident
+            </button>
+
+            <button type="button" onclick="redirectToParking()">
+                Visitor
+            </button>
+
+            <button type="button" class="secondary-button" onclick="closeEntryModal()">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <!-- OCR runs in the browser using Tesseract.js. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.0.2/tesseract.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track It - Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <main class="container">
+        <h1>Admin Dashboard</h1>
+
+        <section class="panel">
+            <h2>Currently Parked Vehicles</h2>
+
+            <p id="adminMessage" class="message" role="status"></p>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Vehicle Number</th>
+                            <th>Phone</th>
+                            <th>Slot</th>
+                            <th>Vehicle Type</th>
+                            <th>Status</th>
+                            <th>Entry Time</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="parkingTableBody">
+                        <tr>
+                            <td colspan="7">Loading parking records...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <button type="button" onclick="loadAdminRecords()">Refresh</button>
+
+            <button type="button" class="secondary-button" onclick="location.href='parking.html'">
+                View Parking Slots
+            </button>
+
+            <button type="button" class="secondary-button" onclick="location.href='index.html'">
+                Back to Entry
+            </button>
+        </section>
+    </main>
+
+    <script>
+        const tableBody = document.getElementById("parkingTableBody");
+        const adminMessage = document.getElementById("adminMessage");
+
+        function showAdminMessage(message, isError = false) {
+            adminMessage.textContent = message;
+            adminMessage.className = isError
+                ? "message error"
+                : "message success";
+        }
+
+        function addCell(row, text) {
+            const cell = document.createElement("td");
+            cell.textContent = text;
+            row.appendChild(cell);
+            return cell;
+        }
+
+        async function loadAdminRecords() {
+            try {
+                const response = await fetch("/api/parking");
+
+                if (!response.ok) {
+                    throw new Error("Could not load parking records.");
+                }
+
+                const records = await response.json();
+                const activeRecords = records.filter(
+                    (record) => record.status === "Occupied"
+                );
+
+                tableBody.replaceChildren();
+
+                if (activeRecords.length === 0) {
+                    const row = document.createElement("tr");
+                    const cell = addCell(row, "No vehicles are currently parked.");
+                    cell.colSpan = 7;
+                    tableBody.appendChild(row);
+                }
+
+                activeRecords.forEach((record) => {
+                    const row = document.createElement("tr");
+
+                    addCell(row, record.carNumber);
+                    addCell(row, record.phone);
+                    addCell(row, record.slotNumber);
+                    addCell(
+                        row,
+                        record.isResident === true
+                            ? "Resident"
+                            : record.isResident === false
+                                ? "Visitor"
+                                : "Not specified"
+                    );
+
+                    const statusCell = addCell(row, record.status);
+                    statusCell.className = "status-occupied";
+
+                    addCell(
+                        row,
+                        record.entryTime
+                            ? new Date(record.entryTime).toLocaleString()
+                            : "Unknown"
+                    );
+
+                    const actionCell = document.createElement("td");
+                    const exitButton = document.createElement("button");
+
+                    exitButton.textContent = "Exit";
+                    exitButton.className = "exit-button";
+                    exitButton.type = "button";
+
+                    exitButton.addEventListener("click", async () => {
+                        const confirmed = window.confirm(
+                            `Confirm exit for ${record.carNumber} from slot ${record.slotNumber}?`
+                        );
+
+                        if (!confirmed) return;
+
+                        exitButton.disabled = true;
+
+                        try {
+                            const exitResponse = await fetch(
+                                `/api/parking/${encodeURIComponent(record._id)}/exit`,
+                                { method: "PATCH" }
+                            );
+
+                            const result = await exitResponse.json();
+
+                            if (!exitResponse.ok) {
+                                throw new Error(result.message || "Could not process exit.");
+                            }
+
+                            showAdminMessage(result.message);
+                            await loadAdminRecords();
+                        } catch (error) {
+                            showAdminMessage(error.message, true);
+                            exitButton.disabled = false;
+                        }
+                    });
+
+                    actionCell.appendChild(exitButton);
+                    row.appendChild(actionCell);
+                    tableBody.appendChild(row);
+                });
+
+                if (activeRecords.length > 0) {
+                    showAdminMessage(
+                        `${activeRecords.length} vehicle(s) currently parked.`
+                    );
+                }
+            } catch (error) {
+                console.error(error);
+                showAdminMessage(
+                    "Could not load records. Check the backend and database.",
+                    true
+                );
+            }
+        }
+
+        loadAdminRecords();
+
+        // Keep the dashboard updated when other entries or exits occur.
+        setInterval(loadAdminRecords, 5000);
+    </script>
+</body>
+
+</html>

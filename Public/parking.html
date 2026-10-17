@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track It - Parking Slots</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <main class="container">
+        <h1>Parking Slots</h1>
+
+        <section class="panel">
+            <p>
+                <span
+                    style="display:inline-block;width:12px;height:12px;background:white;border:1px solid #999;"></span>
+                White = Free
+                &nbsp;&nbsp;
+                <span style="display:inline-block;width:12px;height:12px;background:#ff8b94;"></span>
+                Red = Occupied
+            </p>
+
+            <div class="grid" id="slotsGrid"></div>
+            <p id="parkingMessage" class="message" role="status"></p>
+
+            <button type="button" onclick="loadSlots()">Refresh</button>
+            <button type="button" class="secondary-button" onclick="location.href='index.html'">
+                Back to Entry
+            </button>
+            <button type="button" class="secondary-button" onclick="location.href='admin.html'">
+                Admin Dashboard
+            </button>
+        </section>
+    </main>
+
+    <script>
+        const slotsGrid = document.getElementById("slotsGrid");
+        const parkingMessage = document.getElementById("parkingMessage");
+
+        const allSlots = ["A1", "A2", "A3", "B1", "B2"];
+
+        async function loadSlots() {
+            try {
+                const response = await fetch("/api/parking");
+
+                if (!response.ok) {
+                    throw new Error("Could not retrieve parking data.");
+                }
+
+                const records = await response.json();
+
+                const occupiedSlots = new Set(
+                    records
+                        .filter((record) => record.status === "Occupied")
+                        .map((record) => record.slotNumber)
+                );
+
+                slotsGrid.replaceChildren();
+
+                allSlots.forEach((slot) => {
+                    const slotDiv = document.createElement("div");
+                    slotDiv.className = "slot";
+
+                    const occupied = occupiedSlots.has(slot);
+
+                    if (occupied) {
+                        slotDiv.classList.add("occupied");
+                    }
+
+                    slotDiv.textContent = occupied
+                        ? `${slot} - Occupied`
+                        : `${slot} - Free`;
+
+                    slotsGrid.appendChild(slotDiv);
+                });
+
+                parkingMessage.textContent =
+                    "Parking status updated: " + new Date().toLocaleTimeString();
+                parkingMessage.className = "message success";
+            } catch (error) {
+                console.error(error);
+                parkingMessage.textContent =
+                    "Unable to load parking slots. Check that the server is running.";
+                parkingMessage.className = "message error";
+            }
+        }
+
+        loadSlots();
+
+        // Refresh the display every two seconds.
+        setInterval(loadSlots, 2000);
+    </script>
+</body>
+
+</html>

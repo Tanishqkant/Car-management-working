@@ -1,0 +1,182 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 24px;
+  font-family: Arial, sans-serif;
+  background: #f3f5f8;
+  color: #202938;
+}
+
+h1,
+h2 {
+  text-align: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.panel {
+  background: white;
+  padding: 22px;
+  margin: 20px auto;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+label {
+  display: block;
+  margin: 14px 0 6px;
+  font-weight: bold;
+}
+
+input {
+  display: block;
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #cbd2dc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+button {
+  padding: 10px 16px;
+  margin: 8px 4px 0 0;
+  border: 0;
+  border-radius: 6px;
+  background: #2459d3;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.secondary-button {
+  background: #596579;
+}
+
+.exit-button {
+  background: #bd2937;
+}
+
+video,
+canvas {
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  margin: 12px auto;
+  border-radius: 8px;
+  background: #111;
+}
+
+#popupModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.55);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 420px;
+  padding: 24px;
+  border-radius: 12px;
+  background: white;
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.slot {
+  padding: 24px 10px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: bold;
+  background: white;
+  border: 1px solid #d6dce5;
+  overflow-wrap: anywhere;
+}
+
+.slot.occupied {
+  background: #ff8b94;
+  border-color: #e15b67;
+}
+
+.message {
+  min-height: 24px;
+  margin-top: 12px;
+  overflow-wrap: anywhere;
+}
+
+.message.error {
+  color: #b42318;
+}
+
+.message.success {
+  color: #187447;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+th,
+td {
+  padding: 12px;
+  border: 1px solid #d9dee7;
+  text-align: left;
+  white-space: nowrap;
+}
+
+th {
+  background: #e9edf4;
+}
+
+.status-occupied {
+  color: #b42318;
+  font-weight: bold;
+}
+
+.status-free {
+  color: #187447;
+  font-weight: bold;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 12px;
+  }
+
+  .panel {
+    padding: 15px;
+  }
+}
